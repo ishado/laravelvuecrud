@@ -5,7 +5,7 @@ import AppLayout from '@/Layouts/AppLayout.vue'
 
 // Props
 const props = defineProps({
-    posts: Array,
+    posts: Object,
     filters: {
         type: Object,
         default: () => ({
@@ -64,7 +64,14 @@ function truncate(text: string, length = 50) {
 }
 
 // Delete confirmation with improved UX
-function confirmDelete(post) {
+interface Post {
+    id: number
+    title: string
+    content: string
+    created_at: string
+}
+
+function confirmDelete(post: Post) {
     if (confirm(`Are you sure you want to delete "${post.title}"?`)) {
         router.delete(route('posts.destroy', post.id), {
             onSuccess: () => {
@@ -80,7 +87,7 @@ const getSortIndicator = (column: string) => {
     return direction.value === 'asc' ? '↑' : '↓'
 }
 
-const isEmpty = computed(() => props.posts.length === 0)
+const isEmpty = computed(() => props.posts.data.length === 0)
 </script>
 
 <template>
@@ -186,7 +193,7 @@ const isEmpty = computed(() => props.posts.length === 0)
                                     </div>
                                 </td>
                             </tr>
-                            <tr v-for="post in posts" :key="post.id" class="hover:bg-gray-50">
+                            <tr v-for="post in posts.data" :key="post.id" class="hover:bg-gray-50">
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                     {{ post.title }}
                                 </td>
@@ -231,7 +238,61 @@ const isEmpty = computed(() => props.posts.length === 0)
                     </table>
                 </div>
 
-                <!-- Add pagination component here if needed -->
+                <!-- Pagination -->
+                <div v-if="posts.links" class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                    <div class="flex-1 flex justify-between sm:hidden">
+                        <Link
+                            :href="posts.links.prev"
+                            :disabled="!posts.links.prev"
+                            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                        >
+                            Previous
+                        </Link>
+                        <Link
+                            :href="posts.links.next"
+                            :disabled="!posts.links.next"
+                            class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                        >
+                            Next
+                        </Link>
+                    </div>
+                    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-sm text-gray-700">
+                                Showing
+                                <span class="font-medium">{{ posts.from }}</span>
+                                to
+                                <span class="font-medium">{{ posts.to }}</span>
+                                of
+                                <span class="font-medium">{{ posts.total }}</span>
+                                results
+                            </p>
+                        </div>
+                        <div>
+                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                <template v-for="(link, index) in posts.links" :key="index">
+                                    <Link
+                                        v-if="link.url"
+                                        :href="link.url"
+                                        class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                        :class="{
+                                            'z-10 bg-blue-50 border-blue-500 text-blue-600': link.active,
+                                            'pointer-events-none opacity-50': !link.url
+                                        }"
+                                    >
+                                        <span v-html="link.label" />
+                                    </Link>
+                                    <span
+                                        v-else
+                                        class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 cursor-not-allowed"
+                                    >
+                                        <span v-html="link.label" />
+                                    </span>
+                                </template>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </AppLayout>
