@@ -1,4 +1,32 @@
-<!-- File: resources/js/Pages/Posts/Edit.vue -->
+<script setup lang="ts">
+import { Head, useForm } from '@inertiajs/vue3'
+import AppLayout from '@/Layouts/AppLayout.vue'
+
+// Receive the post prop
+const props = defineProps({
+    post: Object,
+})
+
+// Breadcrumbs
+const breadcrumbs = [
+    { title: 'Posts', href: '/posts' },
+]
+
+// Setup form with post data
+const form = useForm({
+    title: props.post.title,
+    content: props.post.content,
+})
+
+// Submit handler
+function submit() {
+    form.put(route('posts.update', props.post.id), {
+        preserveScroll: true,
+        onSuccess: () => form.reset(),
+    })
+}
+</script>
+
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
 
@@ -36,31 +64,3 @@
     </AppLayout>
 </template>
 
-<script setup>
-import { Head, useForm } from '@inertiajs/vue3'
-import AppLayout from '@/Layouts/AppLayout.vue'
-
-// Receive the post prop
-const props = defineProps({
-    post: Object,
-})
-
-// Breadcrumbs
-const breadcrumbs = [
-    { title: 'Posts', href: '/posts' },
-]
-
-// Setup form with post data
-const form = useForm({
-    title: props.post.title,
-    content: props.post.content,
-})
-
-// Submit handler
-function submit() {
-    form.put(route('posts.update', props.post.id), {
-        preserveScroll: true,
-        onSuccess: () => form.reset(),
-    })
-}
-</script>

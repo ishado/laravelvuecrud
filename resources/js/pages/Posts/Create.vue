@@ -1,25 +1,25 @@
-<script setup>
-    import { Head, Link, useForm } from '@inertiajs/vue3'
-    import AppLayout from '@/Layouts/AppLayout.vue'
+<script setup lang="ts">
+import { Head, Link, useForm } from '@inertiajs/vue3'
+import AppLayout from '@/Layouts/AppLayout.vue'
 
-    // Breadcrumbs
-    const breadcrumbs = [
-        { title: 'Posts', href: '/posts' },
-    ]
+// Breadcrumbs
+const breadcrumbs = [
+    { title: 'Posts', href: '/posts' },
+]
 
-    // Setup form
-    const form = useForm({
-        title: '',
-        content: '',
+// Setup form
+const form = useForm({
+    title: '',
+    content: '',
+})
+
+// Submit handler
+function submit() {
+    form.post(route('posts.store'), {
+        preserveScroll: true,
+        onSuccess: () => form.reset(),
     })
-
-    // Submit handler
-    function submit() {
-        form.post(route('posts.store'), {
-            preserveScroll: true,
-            onSuccess: () => form.reset(),
-        })
-    }
+}
 </script>
 
 <template>
