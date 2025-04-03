@@ -75,7 +75,7 @@ function confirmDelete(post: Post) {
     if (confirm(`Are you sure you want to delete "${post.title}"?`)) {
         router.delete(route('posts.destroy', post.id), {
             onSuccess: () => {
-                showToast('Post deleted successfully')
+                // showToast('Post deleted successfully')
             }
         })
     }
