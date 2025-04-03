@@ -8,10 +8,27 @@ use Inertia\Inertia;
 
 class PostController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $query = Post::query();
+
+        // Search functionality
+        if ($request->has('search') && $request->search) {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('title', 'like', "%{$searchTerm}%")
+                  ->orWhere('content', 'like', "%{$searchTerm}%");
+            });
+        }
+
+        // Sorting
+        $sort = $request->get('sort', 'created_at');
+        $direction = $request->get('direction', 'desc');
+        $query->orderBy($sort, $direction);
+
         return Inertia::render('Posts/Index', [
-            'posts' => Post::paginate(5),
+            'posts' => $query->paginate(5),
+            'filters' => $request->only(['search', 'sort', 'direction'])
         ]);
     }
 
